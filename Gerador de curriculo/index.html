@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currículo</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            padding: 20px;
+        }
+
+        .container, #formContainer {
+            width: 85%;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            color: #007bff;
+            letter-spacing: 2px;
+        }
+
+        .photo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #photo-preview {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            display: none;
+            margin: 0 auto;
+        }
+
+        section {
+            margin-bottom: 20px;
+        }
+
+        section h2 {
+            font-size: 1.8em;
+            color: #343a40;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            list-style-type: square;
+            padding-left: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        button {
+            display: block;
+            margin: 10px auto;
+            padding: 12px 25px;
+            font-size: 1.2em;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                background-color: #fff;
+            }
+
+            .container {
+                width: 100%;
+                box-shadow: none;
+                padding: 20px;
+            }
+
+            .container section {
+                border-bottom: 2px solid #007bff;
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+            }
+
+            button, #formContainer, footer {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="formContainer">
+        <h2>Preencha seu Currículo</h2>
+        <form id="resumeForm">
+            <label for="name">Nome:</label>
+            <input type="text" id="name" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+
+            <label for="phone">Celular:</label>
+            <input type="text" id="phone" required>
+
+            <label for="experience">Experiência Profissional:</label>
+            <textarea id="experience"></textarea>
+
+            <label for="education">Formação Acadêmica:</label>
+            <textarea id="education"></textarea>
+
+            <label for="courses">Cursos Concluídos:</label>
+            <ul id="courses-list"></ul>
+            <input type="text" id="course-input">
+            <button type="button" onclick="addCourse()">Adicionar Curso</button>
+
+            <label for="projects">Projetos Desenvolvidos:</label>
+            <textarea id="projects"></textarea>
+
+            <label for="photo">Foto (opcional):</label>
+            <input type="file" id="photo" accept="image/*" onchange="previewPhoto()">
+
+            <button type="button" onclick="generateResume()">Gerar Currículo</button>
+        </form>
+    </div>
+
+    <div class="container" id="resumeContainer" style="display: none;">
+        <header>
+            <div class="photo-container">
+                <img id="photo-preview" src="#" alt="Foto">
+            </div>
+            <h1>Currículo de <span id="resume-name"></span></h1>
+        </header>
+
+        <section class="contact-info">
+            <h2>Informações de Contato</h2>
+            <p><strong>Email:</strong> <span id="resume-email"></span></p>
+            <p><strong>Celular:</strong> <span id="resume-phone"></span></p>
+        </section>
+
+        <section class="experience">
+            <h2>Experiência Profissional</h2>
+            <p id="resume-experience"></p>
+        </section>
+
+        <section class="education">
+            <h2>Formação Acadêmica</h2>
+            <p id="resume-education"></p>
+        </section>
+
+        <section class="courses">
+            <h2>Cursos Concluídos</h2>
+            <ul id="resume-courses"></ul>
+        </section>
+
+        <section class="projects">
+            <h2>Projetos Desenvolvidos</h2>
+            <p id="resume-projects"></p>
+        </section>
+    </div>
+
+    <button onclick="window.print()">Imprimir Currículo</button>
+
+    <script>
+        function previewPhoto() {
+            const file = document.getElementById('photo').files[0];
+            const reader = new FileReader();
+            reader.onloadend = function () {
+                document.getElementById('photo-preview').src = reader.result;
+                document.getElementById('photo-preview').style.display = 'block';
+            };
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function addCourse() {
+            const input = document.getElementById('course-input');
+            if (input.value.trim()) {
+                const li = document.createElement('li');
+                li.textContent = input.value;
+                document.getElementById('courses-list').appendChild(li);
+                document.getElementById('resume-courses').appendChild(li.cloneNode(true));
+                input.value = '';
+            }
+        }
+
+        function generateResume() {
+            document.querySelectorAll('input, textarea').forEach(input => {
+                if (document.getElementById(`resume-${input.id}`)) {
+                    document.getElementById(`resume-${input.id}`).textContent = input.value;
+                }
+            });
+            document.getElementById("resumeContainer").style.display = "block";
+            document.getElementById("formContainer").style.display = "none";
+        }
+    </script>
+</body>
+</html>
